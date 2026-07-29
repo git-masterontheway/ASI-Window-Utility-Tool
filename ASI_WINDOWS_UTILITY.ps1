@@ -35,6 +35,16 @@ if (-not $isAdmin -and -not $env:ASI_SKIP_ELEVATE) {
 }
 
 # ---------------------------------------------------------------------------------
+# DISPLAY WELCOME CONSOLE BANNER
+# ---------------------------------------------------------------------------------
+Write-Host "======================================================================" -ForegroundColor Cyan
+Write-Host "                ASI WINDOWS UTILITY v2.0                              " -ForegroundColor White
+Write-Host "         Designed & Developed by Amar Kumar (AMAR SMART INDIA)         " -ForegroundColor Yellow
+Write-Host "         Official Website: https://amarsmartindia.in/                  " -ForegroundColor Green
+Write-Host "======================================================================" -ForegroundColor Cyan
+Write-Host " Launching Graphical User Interface... Please wait.`n" -ForegroundColor Gray
+
+# ---------------------------------------------------------------------------------
 # 3. HARDWARE & BATTERY DETECTION LOGIC
 # ---------------------------------------------------------------------------------
 $hasBattery = $false
@@ -61,9 +71,18 @@ catch {
 
 $deviceTypeStr = if ($hasBattery) { "Laptop (Battery Detected)" } else { "Desktop (No Battery Detected)" }
 
-# Determine Assets Path
-$scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
-if (-not $scriptDir) { $scriptDir = Get-Location }
+# Determine Assets Path Safely (Supports irm | iex without errors)
+$scriptDir = $null
+try {
+    if ($MyInvocation.MyCommand -and $MyInvocation.MyCommand.Path) {
+        $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+    }
+} catch {}
+
+if ([string]::IsNullOrWhiteSpace($scriptDir)) {
+    $scriptDir = Get-Location
+}
+
 $assetsDir = Join-Path $scriptDir "assets"
 $logoPath = Join-Path $assetsDir "app_logo.png"
 
