@@ -1,4 +1,4 @@
-﻿<#
+<#
 ===================================================================================
   ASI WINDOWS UTILITY - Premium Minimalist Edition
   Developed by Amar Kumar (AMAR SMART INDIA)
@@ -28,7 +28,8 @@ if (-not $isAdmin -and -not $env:ASI_SKIP_ELEVATE) {
             $p = Start-Process powershell.exe -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File `"$scriptPath`"" -Verb RunAs -PassThru -ErrorAction Stop
             if ($p) { exit }
         }
-    } catch {
+    }
+    catch {
         # Elevation prompt skipped or denied; continuing in GUI mode
     }
 }
@@ -41,7 +42,8 @@ try {
     $batteries = @(Get-CimInstance -ClassName Win32_Battery -ErrorAction SilentlyContinue)
     if ($batteries -and $batteries.Count -gt 0) {
         $hasBattery = $true
-    } else {
+    }
+    else {
         $chassis = @(Get-CimInstance -ClassName Win32_SystemEnclosure -ErrorAction SilentlyContinue)
         if ($chassis) {
             foreach ($c in $chassis) {
@@ -52,7 +54,8 @@ try {
             }
         }
     }
-} catch {
+}
+catch {
     $hasBattery = $false
 }
 
@@ -856,30 +859,30 @@ $reader = New-Object System.Xml.XmlNodeReader($xaml)
 $window = [System.Windows.Markup.XamlReader]::Load($reader)
 
 # Find Control References
-$navToolsBtn   = $window.FindName("NavToolsBtn")
-$navGuideBtn   = $window.FindName("NavGuideBtn")
+$navToolsBtn = $window.FindName("NavToolsBtn")
+$navGuideBtn = $window.FindName("NavGuideBtn")
 $navInstallBtn = $window.FindName("NavInstallBtn")
-$navUpdateBtn  = $window.FindName("NavUpdateBtn")
-$navAboutBtn   = $window.FindName("NavAboutBtn")
+$navUpdateBtn = $window.FindName("NavUpdateBtn")
+$navAboutBtn = $window.FindName("NavAboutBtn")
 
-$tabTools   = $window.FindName("TabTools")
-$tabGuide   = $window.FindName("TabGuide")
+$tabTools = $window.FindName("TabTools")
+$tabGuide = $window.FindName("TabGuide")
 $tabInstall = $window.FindName("TabInstall")
 $tabUpdates = $window.FindName("TabUpdates")
-$tabAbout   = $window.FindName("TabAbout")
+$tabAbout = $window.FindName("TabAbout")
 
-$cardBattery   = $window.FindName("CardBattery")
+$cardBattery = $window.FindName("CardBattery")
 $deviceTypeTxt = $window.FindName("DeviceTypeTxt")
 $txtLogConsole = $window.FindName("TxtLogConsole")
-$cmbTheme      = $window.FindName("CmbTheme")
+$cmbTheme = $window.FindName("CmbTheme")
 
-$logoBorder       = $window.FindName("LogoBorder")
+$logoBorder = $window.FindName("LogoBorder")
 $logoTextFallback = $window.FindName("LogoTextFallback")
 
-$updateItemsList       = $window.FindName("UpdateItemsList")
-$updateStatusTitle     = $window.FindName("UpdateStatusTitle")
-$updateStatusMsg       = $window.FindName("UpdateStatusMsg")
-$updateStatusBanner    = $window.FindName("UpdateStatusBanner")
+$updateItemsList = $window.FindName("UpdateItemsList")
+$updateStatusTitle = $window.FindName("UpdateStatusTitle")
+$updateStatusMsg = $window.FindName("UpdateStatusMsg")
+$updateStatusBanner = $window.FindName("UpdateStatusBanner")
 
 function Register-Click($elementName, $scriptBlock) {
     $elem = $window.FindName($elementName)
@@ -900,10 +903,10 @@ function Write-Log {
     $logLine = "[$timestamp] [$Level] $Message`r`n"
     
     if ($null -ne $txtLogConsole) {
-        $txtLogConsole.Dispatcher.Invoke([System.Action]{
-            $txtLogConsole.AppendText($logLine)
-            $txtLogConsole.ScrollToEnd()
-        })
+        $txtLogConsole.Dispatcher.Invoke([System.Action] {
+                $txtLogConsole.AppendText($logLine)
+                $txtLogConsole.ScrollToEnd()
+            })
     }
 }
 
@@ -914,35 +917,39 @@ function Set-AppTheme($themeMode) {
     $isLight = $false
     if ($themeMode -eq "Light Theme") {
         $isLight = $true
-    } elseif ($themeMode -eq "Dark Theme") {
+    }
+    elseif ($themeMode -eq "Dark Theme") {
         $isLight = $false
-    } else {
+    }
+    else {
         # Auto Mode: Query Windows Personalize Registry
         try {
             $regVal = Get-ItemPropertyValue -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize" -Name "AppsUseLightTheme" -ErrorAction SilentlyContinue
             if ($regVal -eq 1) { $isLight = $true }
-        } catch { $isLight = $false }
+        }
+        catch { $isLight = $false }
     }
 
     $bc = [System.Windows.Media.BrushConverter]::New()
     if ($isLight) {
-        $window.Resources["BgBrush"]             = $bc.ConvertFromString("#F8FAFC")
-        $window.Resources["HeaderBgBrush"]       = $bc.ConvertFromString("#FFFFFF")
-        $window.Resources["CardBgBrush"]         = $bc.ConvertFromString("#FFFFFF")
-        $window.Resources["CardBorderBrush"]     = $bc.ConvertFromString("#E2E8F0")
-        $window.Resources["TextPrimaryBrush"]    = $bc.ConvertFromString("#0F172A")
-        $window.Resources["TextSecondaryBrush"]  = $bc.ConvertFromString("#64748B")
-        $window.Resources["ConsoleBgBrush"]      = $bc.ConvertFromString("#F1F5F9")
+        $window.Resources["BgBrush"] = $bc.ConvertFromString("#F8FAFC")
+        $window.Resources["HeaderBgBrush"] = $bc.ConvertFromString("#FFFFFF")
+        $window.Resources["CardBgBrush"] = $bc.ConvertFromString("#FFFFFF")
+        $window.Resources["CardBorderBrush"] = $bc.ConvertFromString("#E2E8F0")
+        $window.Resources["TextPrimaryBrush"] = $bc.ConvertFromString("#0F172A")
+        $window.Resources["TextSecondaryBrush"] = $bc.ConvertFromString("#64748B")
+        $window.Resources["ConsoleBgBrush"] = $bc.ConvertFromString("#F1F5F9")
         $window.Background = $bc.ConvertFromString("#F8FAFC")
         Write-Log "Theme: Light Mode applied." "INFO"
-    } else {
-        $window.Resources["BgBrush"]             = $bc.ConvertFromString("#0F172A")
-        $window.Resources["HeaderBgBrush"]       = $bc.ConvertFromString("#1E293B")
-        $window.Resources["CardBgBrush"]         = $bc.ConvertFromString("#1E293B")
-        $window.Resources["CardBorderBrush"]     = $bc.ConvertFromString("#334155")
-        $window.Resources["TextPrimaryBrush"]    = $bc.ConvertFromString("#F8FAFC")
-        $window.Resources["TextSecondaryBrush"]  = $bc.ConvertFromString("#94A3B8")
-        $window.Resources["ConsoleBgBrush"]      = $bc.ConvertFromString("#090D16")
+    }
+    else {
+        $window.Resources["BgBrush"] = $bc.ConvertFromString("#0F172A")
+        $window.Resources["HeaderBgBrush"] = $bc.ConvertFromString("#1E293B")
+        $window.Resources["CardBgBrush"] = $bc.ConvertFromString("#1E293B")
+        $window.Resources["CardBorderBrush"] = $bc.ConvertFromString("#334155")
+        $window.Resources["TextPrimaryBrush"] = $bc.ConvertFromString("#F8FAFC")
+        $window.Resources["TextSecondaryBrush"] = $bc.ConvertFromString("#94A3B8")
+        $window.Resources["ConsoleBgBrush"] = $bc.ConvertFromString("#090D16")
         $window.Background = $bc.ConvertFromString("#0F172A")
         Write-Log "Theme: Dark Mode applied." "INFO"
     }
@@ -950,9 +957,9 @@ function Set-AppTheme($themeMode) {
 
 if ($null -ne $cmbTheme) {
     $cmbTheme.Add_SelectionChanged({
-        $selected = $cmbTheme.SelectedItem.Content
-        Set-AppTheme $selected
-    })
+            $selected = $cmbTheme.SelectedItem.Content
+            Set-AppTheme $selected
+        })
 }
 
 # Apply Hardware Battery Detection & Image Logo
@@ -973,7 +980,8 @@ if (Test-Path $logoPath) {
         $imgBrush.Stretch = [System.Windows.Media.Stretch]::UniformToFill
         if ($null -ne $logoBorder) { $logoBorder.Background = $imgBrush }
         if ($null -ne $logoTextFallback) { $logoTextFallback.Visibility = [System.Windows.Visibility]::Collapsed }
-    } catch {
+    }
+    catch {
         Write-Log "Logo load warning: $_" "WARNING"
     }
 }
@@ -1005,11 +1013,11 @@ function Select-Tab($activeTab, $activeBtn) {
     }
 }
 
-if ($null -ne $navToolsBtn)   { $navToolsBtn.Add_Click({ Select-Tab $tabTools $navToolsBtn }) }
-if ($null -ne $navGuideBtn)   { $navGuideBtn.Add_Click({ Select-Tab $tabGuide $navGuideBtn }) }
+if ($null -ne $navToolsBtn) { $navToolsBtn.Add_Click({ Select-Tab $tabTools $navToolsBtn }) }
+if ($null -ne $navGuideBtn) { $navGuideBtn.Add_Click({ Select-Tab $tabGuide $navGuideBtn }) }
 if ($null -ne $navInstallBtn) { $navInstallBtn.Add_Click({ Select-Tab $tabInstall $navInstallBtn }) }
-if ($null -ne $navUpdateBtn)  { $navUpdateBtn.Add_Click({ Select-Tab $tabUpdates $navUpdateBtn }) }
-if ($null -ne $navAboutBtn)   { $navAboutBtn.Add_Click({ Select-Tab $tabAbout $navAboutBtn }) }
+if ($null -ne $navUpdateBtn) { $navUpdateBtn.Add_Click({ Select-Tab $tabUpdates $navUpdateBtn }) }
+if ($null -ne $navAboutBtn) { $navAboutBtn.Add_Click({ Select-Tab $tabAbout $navAboutBtn }) }
 
 # ---------------------------------------------------------------------------------
 # 9. BACKEND LOGIC: TOOLS DASHBOARD (TAB 1)
@@ -1026,9 +1034,11 @@ Register-Click "BtnCleanSystem" {
                     try {
                         if (-not $f.PSIsContainer) { $freedBytes += $f.Length }
                         Remove-Item -Path $f.FullName -Force -Recurse -ErrorAction SilentlyContinue
-                    } catch {}
+                    }
+                    catch {}
                 }
-            } catch {}
+            }
+            catch {}
         }
     }
     $freedMB = [math]::Round($freedBytes / 1MB, 2)
@@ -1037,7 +1047,7 @@ Register-Click "BtnCleanSystem" {
 
 Register-Click "BtnRepairSystem" {
     Write-Log "Initiating SFC System Scan..." "INFO"
-    $window.Dispatcher.Invoke([Action]{}, [System.Windows.Threading.DispatcherPriority]::Background)
+    $window.Dispatcher.Invoke([Action] {}, [System.Windows.Threading.DispatcherPriority]::Background)
     $sfcJob = Start-Job -ScriptBlock { sfc /scannow }
     Wait-Job $sfcJob | Out-Null
     $sfcOut = Receive-Job $sfcJob | Out-String
@@ -1048,7 +1058,8 @@ Register-Click "BtnRepairSystem" {
         Wait-Job $dismJob | Out-Null
         $dismOut = Receive-Job $dismJob | Out-String
         Write-Log "DISM: $dismOut" "SUCCESS"
-    } else {
+    }
+    else {
         Write-Log "System files are clean." "SUCCESS"
     }
 }
@@ -1066,7 +1077,8 @@ Register-Click "BtnScanVirus" {
     try {
         Start-MpScan -ScanType QuickScan
         Write-Log "Defender scan completed." "SUCCESS"
-    } catch { Write-Log "Defender error: $_" "ERROR" }
+    }
+    catch { Write-Log "Defender error: $_" "ERROR" }
 }
 
 Register-Click "BtnOptimizeStartup" {
@@ -1075,7 +1087,8 @@ Register-Click "BtnOptimizeStartup" {
         $startups = @(Get-CimInstance -ClassName Win32_StartupCommand -ErrorAction SilentlyContinue)
         Write-Log "Found $($startups.Count) startup items." "INFO"
         Write-Log "Startup optimization completed." "SUCCESS"
-    } catch { Write-Log "Startup error: $_" "ERROR" }
+    }
+    catch { Write-Log "Startup error: $_" "ERROR" }
 }
 
 Register-Click "BtnFixMouse" {
@@ -1086,7 +1099,8 @@ Register-Click "BtnFixMouse" {
         Set-ItemProperty -Path $mk -Name "MouseThreshold1" -Value "0" -ErrorAction SilentlyContinue
         Set-ItemProperty -Path $mk -Name "MouseThreshold2" -Value "0" -ErrorAction SilentlyContinue
         Write-Log "Mouse acceleration disabled. 1:1 raw input restored!" "SUCCESS"
-    } catch { Write-Log "Mouse fix error: $_" "ERROR" }
+    }
+    catch { Write-Log "Mouse fix error: $_" "ERROR" }
 }
 
 Register-Click "BtnActivateHWID" {
@@ -1094,7 +1108,8 @@ Register-Click "BtnActivateHWID" {
     try {
         Start-Process powershell.exe -ArgumentList "-NoProfile -ExecutionPolicy Bypass -Command `"irm https://get.activated.win | iex`"" -Verb RunAs
         Write-Log "HWID Activation triggered." "SUCCESS"
-    } catch { Write-Log "HWID error: $_" "ERROR" }
+    }
+    catch { Write-Log "HWID error: $_" "ERROR" }
 }
 
 Register-Click "BtnFixSpeaker" {
@@ -1103,7 +1118,8 @@ Register-Click "BtnFixSpeaker" {
         Restart-Service -Name "AudioSrv" -Force -ErrorAction SilentlyContinue
         Restart-Service -Name "AudioEndpointBuilder" -Force -ErrorAction SilentlyContinue
         Write-Log "Audio services restarted." "SUCCESS"
-    } catch { Write-Log "Audio error: $_" "ERROR" }
+    }
+    catch { Write-Log "Audio error: $_" "ERROR" }
 }
 
 Register-Click "BtnSaveBattery" {
@@ -1111,7 +1127,8 @@ Register-Click "BtnSaveBattery" {
     try {
         powercfg /setactive 381b4222-f694-41f0-9685-ff5bb260df2e | Out-Null
         Write-Log "Battery saver plan activated!" "SUCCESS"
-    } catch { Write-Log "Power plan error: $_" "ERROR" }
+    }
+    catch { Write-Log "Power plan error: $_" "ERROR" }
 }
 
 Register-Click "BtnOptimizeProcesses" {
@@ -1137,33 +1154,36 @@ function Install-AppPackage($appId, $appName) {
             $p = Start-Process winget -ArgumentList "install --id $appId -e --silent --accept-package-agreements --accept-source-agreements" -NoNewWindow -Wait -PassThru -ErrorAction SilentlyContinue
             if ($p.ExitCode -eq 0) {
                 Write-Log "$appName installed successfully!" "SUCCESS"
-            } else {
+            }
+            else {
                 Write-Log "Winget exit code $($p.ExitCode) for $appName." "WARNING"
             }
-        } catch { Write-Log "Install error for $appName - $_" "ERROR" }
-    } else {
+        }
+        catch { Write-Log "Install error for $appName - $_" "ERROR" }
+    }
+    else {
         Write-Log "Winget not found on this system." "ERROR"
     }
 }
 
 # 1-Click Individual Install Handlers
-Register-Click "BtnInstallChrome"      { Install-AppPackage "Google.Chrome" "Google Chrome" }
-Register-Click "BtnInstallFirefox"     { Install-AppPackage "Mozilla.Firefox" "Mozilla Firefox" }
-Register-Click "BtnInstallComet"       { Install-AppPackage "CometNetwork.CometBrowser" "Comet Browser" }
+Register-Click "BtnInstallChrome" { Install-AppPackage "Google.Chrome" "Google Chrome" }
+Register-Click "BtnInstallFirefox" { Install-AppPackage "Mozilla.Firefox" "Mozilla Firefox" }
+Register-Click "BtnInstallComet" { Install-AppPackage "CometNetwork.CometBrowser" "Comet Browser" }
 Register-Click "BtnInstallAntigravity" { Install-AppPackage "Google.Antigravity" "Antigravity IDE" }
-Register-Click "BtnInstallPython"      { Install-AppPackage "Python.Python.3.12" "Python 3" }
-Register-Click "BtnInstallVLC"         { Install-AppPackage "VideoLAN.VLC" "VLC Media Player" }
-Register-Click "BtnInstallVSCode"      { Install-AppPackage "Microsoft.VisualStudioCode" "VS Code" }
-Register-Click "BtnInstallTelegram"    { Install-AppPackage "Telegram.TelegramDesktop" "Telegram" }
-Register-Click "BtnInstallWhatsApp"    { Install-AppPackage "WhatsApp.WhatsApp" "WhatsApp" }
-Register-Click "BtnInstallRustDesk"    { Install-AppPackage "RustDesk.RustDesk" "RustDesk" }
-Register-Click "BtnInstall7Zip"        { Install-AppPackage "7zip.7zip" "7-Zip" }
-Register-Click "BtnInstallNotepadPP"   { Install-AppPackage "Notepad++.Notepad++" "Notepad++" }
-Register-Click "BtnInstallGit"         { Install-AppPackage "Git.Git" "Git" }
-Register-Click "BtnInstallNodeJS"      { Install-AppPackage "OpenJS.NodeJS.LTS" "Node.js LTS" }
-Register-Click "BtnInstallOBS"         { Install-AppPackage "OBSProject.OBSStudio" "OBS Studio" }
-Register-Click "BtnInstallDiscord"     { Install-AppPackage "Discord.Discord" "Discord" }
-Register-Click "BtnInstallSpotify"     { Install-AppPackage "Spotify.Spotify" "Spotify" }
+Register-Click "BtnInstallPython" { Install-AppPackage "Python.Python.3.12" "Python 3" }
+Register-Click "BtnInstallVLC" { Install-AppPackage "VideoLAN.VLC" "VLC Media Player" }
+Register-Click "BtnInstallVSCode" { Install-AppPackage "Microsoft.VisualStudioCode" "VS Code" }
+Register-Click "BtnInstallTelegram" { Install-AppPackage "Telegram.TelegramDesktop" "Telegram" }
+Register-Click "BtnInstallWhatsApp" { Install-AppPackage "WhatsApp.WhatsApp" "WhatsApp" }
+Register-Click "BtnInstallRustDesk" { Install-AppPackage "RustDesk.RustDesk" "RustDesk" }
+Register-Click "BtnInstall7Zip" { Install-AppPackage "7zip.7zip" "7-Zip" }
+Register-Click "BtnInstallNotepadPP" { Install-AppPackage "Notepad++.Notepad++" "Notepad++" }
+Register-Click "BtnInstallGit" { Install-AppPackage "Git.Git" "Git" }
+Register-Click "BtnInstallNodeJS" { Install-AppPackage "OpenJS.NodeJS.LTS" "Node.js LTS" }
+Register-Click "BtnInstallOBS" { Install-AppPackage "OBSProject.OBSStudio" "OBS Studio" }
+Register-Click "BtnInstallDiscord" { Install-AppPackage "Discord.Discord" "Discord" }
+Register-Click "BtnInstallSpotify" { Install-AppPackage "Spotify.Spotify" "Spotify" }
 
 # All checkbox names for batch operations
 $allChkNames = @("ChkChrome", "ChkFirefox", "ChkComet", "ChkAntigravity", "ChkPython", "ChkVLC", "ChkVSCode", "ChkTelegram", "ChkWhatsApp", "ChkRustDesk", "Chk7Zip", "ChkNotepadPP", "ChkGit", "ChkNodeJS", "ChkOBS", "ChkDiscord", "ChkSpotify")
@@ -1272,7 +1292,7 @@ Register-Click "BtnScanUpdates" {
             $noUpdateTxt.FontSize = 14
             $noUpdateTxt.FontWeight = [System.Windows.FontWeights]::Bold
             $noUpdateTxt.HorizontalAlignment = [System.Windows.HorizontalAlignment]::Center
-            $noUpdateTxt.Margin = New-Object System.Windows.Thickness(0,30,0,30)
+            $noUpdateTxt.Margin = New-Object System.Windows.Thickness(0, 30, 0, 30)
             $updateItemsList.Children.Add($noUpdateTxt) | Out-Null
             Update-StatusBanner "Up to Date" "All installed software is already at the latest version." "#ECFDF5" "#A7F3D0" "#065F46"
             Write-Log "No updates available." "SUCCESS"
@@ -1287,7 +1307,8 @@ Register-Click "BtnScanUpdates" {
             if ($dashLine[$ci] -eq '-' -and -not $inDash) {
                 $colStarts.Add($ci) | Out-Null
                 $inDash = $true
-            } elseif ($dashLine[$ci] -ne '-') {
+            }
+            elseif ($dashLine[$ci] -ne '-') {
                 $inDash = $false
             }
         }
@@ -1332,11 +1353,11 @@ Register-Click "BtnScanUpdates" {
 
                 if ($nameVal -and $curVal -and $availVal -and $nameVal -ne "Name") {
                     $updatableApps.Add(@{
-                        Name = $nameVal
-                        Id = $idVal
-                        Current = $curVal
-                        Available = $availVal
-                    }) | Out-Null
+                            Name      = $nameVal
+                            Id        = $idVal
+                            Current   = $curVal
+                            Available = $availVal
+                        }) | Out-Null
                 }
             }
         }
@@ -1348,7 +1369,7 @@ Register-Click "BtnScanUpdates" {
             $noUpdateTxt.FontSize = 14
             $noUpdateTxt.FontWeight = [System.Windows.FontWeights]::Bold
             $noUpdateTxt.HorizontalAlignment = [System.Windows.HorizontalAlignment]::Center
-            $noUpdateTxt.Margin = New-Object System.Windows.Thickness(0,30,0,30)
+            $noUpdateTxt.Margin = New-Object System.Windows.Thickness(0, 30, 0, 30)
             $updateItemsList.Children.Add($noUpdateTxt) | Out-Null
             Update-StatusBanner "Up to Date" "All installed software is at the latest version." "#ECFDF5" "#A7F3D0" "#065F46"
             Write-Log "No updates available." "SUCCESS"
@@ -1359,8 +1380,8 @@ Register-Click "BtnScanUpdates" {
         foreach ($app in $updatableApps) {
             $rowBorder = New-Object System.Windows.Controls.Border
             $rowBorder.CornerRadius = [System.Windows.CornerRadius]::new(6.0)
-            $rowBorder.Padding = New-Object System.Windows.Thickness(12,8,12,8)
-            $rowBorder.Margin = New-Object System.Windows.Thickness(0,1,0,1)
+            $rowBorder.Padding = New-Object System.Windows.Thickness(12, 8, 12, 8)
+            $rowBorder.Margin = New-Object System.Windows.Thickness(0, 1, 0, 1)
             $rowBorder.Background = $window.Resources["BgBrush"]
 
             $rowGrid = New-Object System.Windows.Controls.Grid
@@ -1416,21 +1437,22 @@ Register-Click "BtnScanUpdates" {
             $btnUpdate.Background = $window.Resources["AccentBrush"]
             $btnUpdate.FontSize = 10
             $btnUpdate.FontWeight = [System.Windows.FontWeights]::Bold
-            $btnUpdate.Padding = New-Object System.Windows.Thickness(8,3,8,3)
+            $btnUpdate.Padding = New-Object System.Windows.Thickness(8, 3, 8, 3)
             $btnUpdate.Cursor = [System.Windows.Input.Cursors]::Hand
             $btnUpdate.BorderThickness = New-Object System.Windows.Thickness(0)
             $btnUpdate.HorizontalAlignment = [System.Windows.HorizontalAlignment]::Center
             $btnUpdate.VerticalAlignment = [System.Windows.VerticalAlignment]::Center
             $btnUpdate.Tag = $app.Id
             $btnUpdate.Add_Click({
-                param($sender, $e)
-                $pkgId = $sender.Tag
-                Write-Log "Updating package [$pkgId]..." "INFO"
-                try {
-                    Start-Process winget -ArgumentList "upgrade --id $pkgId -e --silent --accept-package-agreements --accept-source-agreements" -NoNewWindow -Wait -ErrorAction SilentlyContinue
-                    Write-Log "Package [$pkgId] updated successfully!" "SUCCESS"
-                } catch { Write-Log "Update error for $pkgId - $_" "ERROR" }
-            })
+                    param($sender, $e)
+                    $pkgId = $sender.Tag
+                    Write-Log "Updating package [$pkgId]..." "INFO"
+                    try {
+                        Start-Process winget -ArgumentList "upgrade --id $pkgId -e --silent --accept-package-agreements --accept-source-agreements" -NoNewWindow -Wait -ErrorAction SilentlyContinue
+                        Write-Log "Package [$pkgId] updated successfully!" "SUCCESS"
+                    }
+                    catch { Write-Log "Update error for $pkgId - $_" "ERROR" }
+                })
 
             # Apply rounded template via XAML string (safer than FrameworkElementFactory)
             $btnXamlStr = '<ControlTemplate xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" TargetType="Button"><Border CornerRadius="6" Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}"><ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/></Border></ControlTemplate>'
@@ -1451,7 +1473,8 @@ Register-Click "BtnScanUpdates" {
         Update-StatusBanner "Updates Available" "$($updatableApps.Count) package(s) have newer versions available." "#FFFBEB" "#FCD34D" "#92400E"
         Write-Log "Found $($updatableApps.Count) updatable packages." "SUCCESS"
 
-    } catch {
+    }
+    catch {
         Write-Log "Scan error: $_" "ERROR"
         Update-StatusBanner "Scan Failed" "An error occurred while scanning. Check the log for details." "#FEF2F2" "#FECACA" "#991B1B"
     }
@@ -1492,7 +1515,8 @@ Register-Click "BtnUpdateSelected" {
         try {
             Start-Process winget -ArgumentList "upgrade --id $pkgId -e --silent --accept-package-agreements --accept-source-agreements" -NoNewWindow -Wait -ErrorAction SilentlyContinue
             Write-Log "$pkgId updated!" "SUCCESS"
-        } catch {
+        }
+        catch {
             Write-Log "Failed to update $pkgId - $_" "ERROR"
         }
     }
@@ -1518,12 +1542,13 @@ foreach ($btnKey in $socialLinks.Keys) {
     if ($null -ne $btnElem) {
         $btnElem.Tag = $targetUrl
         $btnElem.Add_Click({
-            param($sender, $e)
-            $urlToOpen = $sender.Tag
-            Write-Log "Opening: $urlToOpen" "INFO"
-            Start-Process $urlToOpen
-        })
+                param($sender, $e)
+                $urlToOpen = $sender.Tag
+                Write-Log "Opening: $urlToOpen" "INFO"
+                Start-Process $urlToOpen
+            })
     }
+
 }
 
 Register-Click "BtnClearLog" {
