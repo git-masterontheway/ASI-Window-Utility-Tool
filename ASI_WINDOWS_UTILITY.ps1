@@ -762,8 +762,8 @@ $logoPath = Join-Path $assetsDir "app_logo.png"
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <Border Width="80" Height="80" CornerRadius="16" Background="{DynamicResource AccentBrush}" Margin="0,0,20,0">
-                                <TextBlock Text="ASI" Foreground="White" FontWeight="Bold" FontSize="28" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <Border x:Name="AboutLogoBorder" Width="80" Height="80" CornerRadius="16" Background="{DynamicResource AccentBrush}" Margin="0,0,20,0">
+                                <TextBlock Text="ASI" Foreground="White" FontWeight="Bold" FontSize="28" HorizontalAlignment="Center" VerticalAlignment="Center" x:Name="AboutLogoTextFallback"/>
                             </Border>
                             <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                 <TextBlock Text="AMAR SMART INDIA" Foreground="{DynamicResource TextPrimaryBrush}" FontSize="22" FontWeight="Bold"/>
@@ -897,6 +897,8 @@ $cmbTheme = $window.FindName("CmbTheme")
 
 $logoBorder = $window.FindName("LogoBorder")
 $logoTextFallback = $window.FindName("LogoTextFallback")
+$aboutLogoBorder = $window.FindName("AboutLogoBorder")
+$aboutLogoTextFallback = $window.FindName("AboutLogoTextFallback")
 
 $updateItemsList = $window.FindName("UpdateItemsList")
 $updateStatusTitle = $window.FindName("UpdateStatusTitle")
@@ -981,26 +983,45 @@ if ($null -ne $cmbTheme) {
         })
 }
 
-# Apply Hardware Battery Detection & Image Logo
+# Apply Hardware Battery Detection & Image Logo (Local + Web Fallback)
 if ($null -ne $deviceTypeTxt) { $deviceTypeTxt.Text = $deviceTypeStr }
 if (-not $hasBattery -and $null -ne $cardBattery) {
     $cardBattery.Visibility = [System.Windows.Visibility]::Collapsed
 }
 
+$rawLogoUrl = "https://raw.githubusercontent.com/git-masterontheway/ASI-Window-Utility-Tool/refs/heads/main/assets/app_logo.png"
+
+$uriToLoad = $null
 if (Test-Path $logoPath) {
+    try {
+        $uriToLoad = New-Object System.Uri((Resolve-Path $logoPath).Path)
+    } catch {}
+}
+
+if ($null -eq $uriToLoad) {
+    try {
+        $uriToLoad = New-Object System.Uri($rawLogoUrl)
+    } catch {}
+}
+
+if ($null -ne $uriToLoad) {
     try {
         $bitmap = New-Object System.Windows.Media.Imaging.BitmapImage
         $bitmap.BeginInit()
         $bitmap.CacheOption = [System.Windows.Media.Imaging.BitmapCacheOption]::OnLoad
-        $bitmap.UriSource = New-Object System.Uri((Resolve-Path $logoPath).Path)
+        $bitmap.UriSource = $uriToLoad
         $bitmap.EndInit()
+
         $imgBrush = New-Object System.Windows.Media.ImageBrush
         $imgBrush.ImageSource = $bitmap
         $imgBrush.Stretch = [System.Windows.Media.Stretch]::UniformToFill
+
         if ($null -ne $logoBorder) { $logoBorder.Background = $imgBrush }
         if ($null -ne $logoTextFallback) { $logoTextFallback.Visibility = [System.Windows.Visibility]::Collapsed }
-    }
-    catch {
+
+        if ($null -ne $aboutLogoBorder) { $aboutLogoBorder.Background = $imgBrush }
+        if ($null -ne $aboutLogoTextFallback) { $aboutLogoTextFallback.Visibility = [System.Windows.Visibility]::Collapsed }
+    } catch {
         Write-Log "Logo load warning: $_" "WARNING"
     }
 }
